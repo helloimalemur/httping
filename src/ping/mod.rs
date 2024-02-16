@@ -3,13 +3,15 @@ use std::process;
 use std::time::Duration;
 
 pub struct PingHost {
+    server_domain: String,
     server_address: String,
     server_port: u32,
 }
 
 impl PingHost {
-    pub async fn new(server_address: String, server_port: u32) -> PingHost {
+    pub async fn new(server_domain: String, server_address: String, server_port: u32) -> PingHost {
         PingHost {
+            server_domain,
             server_address,
             server_port,
         }

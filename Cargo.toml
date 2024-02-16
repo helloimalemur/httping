@@ -1,5 +1,6 @@
 [package]
 name = "httping"
+description = "Ping for HTTP/s"
 version = "0.1.0"
 edition = "2021"
 authors = ["james@koonts.net"]

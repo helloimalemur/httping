@@ -62,6 +62,22 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn ping_bool_https() {
+        let wrapped_result = ping("koonts.net", "", "https", 443).await;
+        let result = wrapped_result.unwrap();
+        println!("{:#?}", result);
+        assert_eq!(result, true);
+    }
+
+    #[tokio::test]
+    async fn ping_bool_ip_https() {
+        let wrapped_result = ping("", "96.30.198.61", "https", 443).await;
+        let result = wrapped_result.unwrap();
+        println!("{:#?}", result);
+        assert_eq!(result, true);
+    }
+
+    #[tokio::test]
     async fn ping_full() {
         let wrapped_result = ping_with_metrics("koonts.net", "", "http", 80).await;
         let result = wrapped_result.unwrap();

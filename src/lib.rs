@@ -47,6 +47,13 @@ mod tests {
     }
 
     #[tokio::test]
+    async fn ping_bool_ip() {
+        let result = ping("", "96.30.198.61", "http", 80).await;
+        println!("{:#?}", result);
+        assert_eq!(result, true);
+    }
+
+    #[tokio::test]
     async fn ping_full() {
         let result = ping_with_metrics("koonts.net", "", "http", 80).await;
         let success = result.success;

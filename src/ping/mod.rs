@@ -1,7 +1,6 @@
 use bytes::BytesMut;
 use chrono::Local;
 use reqwest::{ClientBuilder, Error};
-use std::process;
 use std::time::{Duration, SystemTime};
 
 pub struct PingHost {
@@ -33,11 +32,6 @@ impl PingHost {
     }
 
     pub async fn start(&self) -> Result<PingHostResult, Error> {
-        let client = ClientBuilder::new()
-            .danger_accept_invalid_certs(true)
-            .timeout(Duration::from_secs(7))
-            .build();
-
         let mut full_addr = String::new();
 
         if self.server_domain.is_empty() && !self.server_address.is_empty() {
@@ -56,7 +50,7 @@ impl PingHost {
             );
         }
 
-        // println!("{}", full_addr);
+        println!("{}", full_addr);
 
         let now = Local::now().timestamp();
         let mut rtt = 0u64;
@@ -64,7 +58,16 @@ impl PingHost {
         let mut body = BytesMut::new();
         let sys_time = SystemTime::now();
 
-        let mut res = reqwest::get(full_addr).await.unwrap();
+        // let mut res = reqwest::get(full_addr).await.unwrap();
+        let mut res = ClientBuilder::new()
+            .danger_accept_invalid_certs(true)
+            .timeout(Duration::from_secs(12))
+            .build()
+            .unwrap()
+            .get(full_addr.clone())
+            .send()
+            .await
+            .unwrap();
 
         while let Some(chunk) = res.chunk().await.unwrap() {
             // println!("Chunk: {:?}", chunk);

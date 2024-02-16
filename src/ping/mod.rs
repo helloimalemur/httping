@@ -50,7 +50,7 @@ impl PingHost {
             );
         }
 
-        println!("{}", full_addr);
+        // println!("{}", full_addr);
         #[allow(unused_variables)]
         let now = Local::now().timestamp();
         #[allow(unused_mut)]

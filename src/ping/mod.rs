@@ -10,7 +10,7 @@ pub struct PingHost {
     server_port: u32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PingHostResult {
     pub success: bool,
     pub rtt: u128,
@@ -60,18 +60,15 @@ impl PingHost {
         let mut body = BytesMut::new();
         let sys_time = SystemTime::now();
 
-        // let mut res = reqwest::get(full_addr).await.unwrap();
         let mut res = ClientBuilder::new()
             .danger_accept_invalid_certs(true)
             .timeout(Duration::from_secs(12))
-            .build()
-            .unwrap()
+            .build()?
             .get(full_addr.clone())
             .send()
-            .await
-            .unwrap();
+            .await?;
 
-        while let Some(chunk) = res.chunk().await.unwrap() {
+        while let Some(chunk) = res.chunk().await? {
             // println!("Chunk: {:?}", chunk);
             if !chunk.is_empty() {
                 body.extend_from_slice(&chunk.clone())
@@ -83,7 +80,7 @@ impl PingHost {
         let post_req_sys_time = SystemTime::now();
         let rtt = post_req_sys_time
             .duration_since(sys_time)
-            .unwrap()
+            .expect("Could not calculate duration since")
             .as_millis();
         // println!("RTT: {}", rtt);
 

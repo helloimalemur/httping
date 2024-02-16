@@ -1,8 +1,8 @@
+use bytes::BytesMut;
+use chrono::Local;
 use reqwest::{ClientBuilder, Error};
 use std::process;
 use std::time::{Duration, SystemTime};
-use chrono::Local;
-use bytes::BytesMut;
 
 pub struct PingHost {
     server_domain: String,
@@ -76,15 +76,19 @@ impl PingHost {
         // println!("Chunk: {:?}", body);
 
         let post_req_sys_time = SystemTime::now();
-        let rtt = post_req_sys_time.duration_since(sys_time).unwrap().as_millis();
+        let rtt = post_req_sys_time
+            .duration_since(sys_time)
+            .unwrap()
+            .as_millis();
         // println!("RTT: {}", rtt);
-
-
 
         return Ok(if !body.is_empty() {
             PingHostResult { success: true, rtt }
         } else {
-            PingHostResult { success: false, rtt }
+            PingHostResult {
+                success: false,
+                rtt,
+            }
         });
     }
 }

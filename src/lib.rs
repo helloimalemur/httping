@@ -18,18 +18,22 @@ pub async fn ping(server_domain: &str, host_address: &str, protocol: &str, host_
     result.success
 }
 
-pub async fn ping_with_metrics(server_domain: &str, host_address: &str, protocol: &str, host_port: u32) -> PingHostResult {
+pub async fn ping_with_metrics(
+    server_domain: &str,
+    host_address: &str,
+    protocol: &str,
+    host_port: u32,
+) -> PingHostResult {
     let host = PingHost::new(
         server_domain.to_string(),
         host_address.to_string(),
         protocol.to_string(),
         host_port,
     )
-        .await;
+    .await;
     let result: PingHostResult = host.start().await.unwrap();
     result
 }
-
 
 #[cfg(test)]
 mod tests {

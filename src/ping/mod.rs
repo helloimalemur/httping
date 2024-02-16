@@ -73,7 +73,7 @@ impl PingHost {
 
         while let Some(chunk) = res.chunk().await.unwrap() {
             // println!("Chunk: {:?}", chunk);
-            if &chunk.len() > &0 {
+            if !chunk.is_empty() {
                 body.extend_from_slice(&chunk.clone())
             }
         }
@@ -87,13 +87,13 @@ impl PingHost {
             .as_millis();
         // println!("RTT: {}", rtt);
 
-        return Ok(if !body.is_empty() {
+        Ok(if !body.is_empty() {
             PingHostResult { success: true, rtt }
         } else {
             PingHostResult {
                 success: false,
                 rtt,
             }
-        });
+        })
     }
 }

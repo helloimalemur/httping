@@ -1,12 +1,20 @@
-use reqwest::ClientBuilder;
+use reqwest::{ClientBuilder, Error};
 use std::process;
-use std::time::Duration;
+use std::time::{Duration, SystemTime};
+use chrono::Local;
+use bytes::BytesMut;
 
 pub struct PingHost {
     server_domain: String,
     server_address: String,
     protocol: String,
     server_port: u32,
+}
+
+#[derive(Debug)]
+pub struct PingHostResult {
+    pub success: bool,
+    pub rtt: u128,
 }
 
 impl PingHost {
@@ -24,7 +32,7 @@ impl PingHost {
         }
     }
 
-    pub async fn start(&self) -> bool {
+    pub async fn start(&self) -> Result<PingHostResult, Error> {
         let client = ClientBuilder::new()
             .danger_accept_invalid_certs(true)
             .timeout(Duration::from_secs(7))
@@ -48,13 +56,35 @@ impl PingHost {
             );
         }
 
-        println!("{}", full_addr);
+        // println!("{}", full_addr);
 
-        let response = match client {
-            Ok(r) => r.get(full_addr).send().await,
-            Err(_e) => process::exit(2),
-        };
+        let now = Local::now().timestamp();
+        let mut rtt = 0u64;
 
-        return if response.is_ok() { true } else { false };
+        let mut body = BytesMut::new();
+        let sys_time = SystemTime::now();
+
+        let mut res = reqwest::get(full_addr).await.unwrap();
+
+        while let Some(chunk) = res.chunk().await.unwrap() {
+            // println!("Chunk: {:?}", chunk);
+            if &chunk.len() > &0 {
+                body.extend_from_slice(&chunk.clone())
+            }
+        }
+
+        // println!("Chunk: {:?}", body);
+
+        let post_req_sys_time = SystemTime::now();
+        let rtt = post_req_sys_time.duration_since(sys_time).unwrap().as_millis();
+        // println!("RTT: {}", rtt);
+
+
+
+        return Ok(if !body.is_empty() {
+            PingHostResult { success: true, rtt }
+        } else {
+            PingHostResult { success: false, rtt }
+        });
     }
 }

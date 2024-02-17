@@ -3,10 +3,6 @@ use reqwest::Error;
 
 mod ping;
 
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
-
 pub async fn ping(
     server_domain: &str,
     host_address: &str,
